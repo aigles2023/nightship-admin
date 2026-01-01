@@ -13,18 +13,16 @@ const center = {
 const mapContainerStyle = {
   width: '100%',
   height: '100%',
-  position: 'absolute',
-  top: '60px', // petit espace pour les filtres
-  left: '0',
+  position: 'relative', // ✅ plus besoin d’absolu ici
 };
 
 const wrapperStyle = {
-  position: 'fixed',
-  top: 0,
-  left: '200px', // correspond à largeur sidebar
-  right: 0,
-  bottom: 0,
+  position: 'relative',
+  marginLeft: 'var(--sidebar-width)', // ✅ s'aligne sur la sidebar du layout
   backgroundColor: '#000',
+  height: 'calc(100vh - 70px)', // ✅ espace sous le Header
+  marginTop: '70px', // ✅ sous le HeaderBar
+  overflow: 'hidden',
 };
 
 const filterBarStyle = {

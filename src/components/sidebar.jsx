@@ -1,157 +1,218 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { getAuth } from 'firebase/auth';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { getAuth, signOut } from "firebase/auth";
 
-const Sidebar = () => {
-  const location = useLocation();
+export default function Sidebar() {
+  const [collapsed, setCollapsed] = useState(false);
+
+  useEffect(() => {
+    const width = collapsed ? "60px" : "200px";
+    document.documentElement.style.setProperty("--sidebar-width", width);
+  }, [collapsed]);
+
   const navigate = useNavigate();
+  const location = useLocation();
   const auth = getAuth();
-  const user = auth.currentUser;
 
-  const isActive = (path) => {
-    if (path === '/orders') return location.pathname.startsWith('/orders');
-    if (path === '/settings') return location.pathname.startsWith('/settings') || location.pathname.startsWith('/change-password') || location.pathname.startsWith('/about');
-    return location.pathname === path;
-  };
-
-  const menu = [
-    { path: '/', label: 'Dashboard' },
-    { path: '/orders', label: 'Orders' },
-    { path: '/archived-orders', label: 'Archives orders' },
-    { path: '/users', label: 'Users' },
-    { path: '/map', label: 'Live Map' },
-    { path: '/support', label: 'Support' },
-    { path: '/settings', label: 'Settings' },
-    { path: '/admin', label: 'Admin' },
-    { path: '/audit-logs', label: 'Audit Logs' },
-  ];
-
-  const handleLogout = () => {
-    auth.signOut().then(() => {
-      navigate('/login');
-    });
-  };
-
-  const renderAvatar = () => {
-    if (user?.photoURL) {
-      return (
-        <img
-          src={user.photoURL}
-          alt="Profile"
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: '50%',
-            objectFit: 'cover'
-          }}
-        />
-      );
-    } else {
-      const initials = user?.email?.charAt(0)?.toUpperCase() || '?';
-      return (
-        <div
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: '50%',
-            backgroundColor: '#10B981',
-            color: 'white',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: 'bold',
-            fontSize: 18
-          }}
-        >
-          {initials}
-        </div>
-      );
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate("/login");
+    } catch (error) {
+      console.error("Error logging out:", error);
     }
   };
 
-  return (
-    <div style={{
-      width: '220px',
-      background: '#111827',
-      color: 'white',
-      height: '100vh',
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-      padding: '20px',
-      boxSizing: 'border-box',
-      overflowY: 'auto',
-      zIndex: 1000,
-    }}>
-      {/* Top section */}
-      <div>
-        <Link to="/admin-profile" style={{ textDecoration: 'none', color: 'inherit' }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            marginBottom: '1rem',
-            cursor: 'pointer'
-          }}>
-            {renderAvatar()}
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontWeight: 'bold', fontSize: '1rem' }}>Admin</span>
-              <span style={{ fontSize: '0.8rem', color: '#ccc' }}>
-                {user?.email || 'unknown@admin.com'}
-              </span>
-            </div>
-          </div>
-        </Link>
+  const menuItems = [
+    { key: "dashboard", label: "Dashboards", route: "/cs-dashboard", icon: "📊" },
+    { key: "orders", label: "Orders", route: "/orders", icon: "📦" },
+    { key: "archives", label: "Archives", route: "/archive-order-dash", icon: "📄" },
+    { key: "users", label: "Users", route: "/users", icon: "👤" },
+    { key: "drivermanagement", label: "Driver Manag", route: "/driver-management", icon: "👤" },
+    { key: "live", label: "Live Map", route: "/live-map", icon: "🗺️" },
+    { key: "support", label: "Support", route: "/support", icon: "💬" },
+    { key: "settings", label: "Settings", route: "/settings", icon: "⚙️" },
+    { key: "admin", label: "Admin", route: "/admin", icon: "🔐" },
+    { key: "audit", label: "Audit Logs", route: "/audit-logs", icon: "🧾" },
+  ];
 
-        <ul style={{ listStyle: 'none', padding: 0, marginTop: '1.5rem' }}>
-          {menu.map((item) => (
-            <li key={item.path} style={{ marginBottom: '1rem' }}>
-              <Link to={item.path} style={{
-                color: isActive(item.path) ? '#10B981' : 'white',
-                textDecoration: 'none',
-                fontWeight: isActive(item.path) ? 'bold' : 'normal'
-              }}>
-                {item.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
+  return (
+    <aside
+      style={{
+        ...styles.sidebar,
+        width: "var(--sidebar-width)",
+        transition: "width 0.3s ease", // ⭐ Animation sidebar
+      }}
+    >
+      <div
+        onClick={() => setCollapsed(!collapsed)}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: collapsed ? "center" : "flex-end",
+          cursor: "pointer",
+          marginBottom: 16,
+          transition: "all 0.3s ease",
+        }}
+      >
+        <span
+          style={{
+            fontSize: 18,
+            display: "inline-block",
+            transition: "transform 0.3s ease",
+            transform: collapsed ? "rotate(0deg)" : "rotate(180deg)", // ⭐ Rotation smooth
+          }}
+        >
+          ⏴
+        </span>
       </div>
 
-      {/* Bottom section */}
-      <div style={{ paddingTop: 50 }}>
+      <div
+        style={{
+          ...styles.sidebarHeader,
+          textAlign: collapsed ? "center" : "left",
+          opacity: collapsed ? 1 : 1,
+          transition: "opacity 0.3s ease", // ⭐ Fade in/out
+        }}
+      >
+        {collapsed ? "SD" : "shipdash"}
+      </div>
+
+      <div style={styles.sidebarNav}>
+        {menuItems.map((item) => {
+          const isActive = location.pathname === item.route;
+          return (
+            <div
+              key={item.key}
+              onClick={() => navigate(item.route)}
+              style={{
+                ...styles.sidebarItem,
+                flexDirection: collapsed ? "column" : "row",
+                alignItems: "center",
+                justifyContent: collapsed ? "center" : "space-between",
+                backgroundColor: isActive ? "#F5F7FB" : "transparent",
+                borderLeft: collapsed
+                  ? "none"
+                  : isActive
+                  ? "3px solid #5B21B6"
+                  : "3px solid transparent",
+                color: isActive ? "#5B21B6" : "#374151",
+                fontWeight: isActive ? 700 : 500,
+                position: "relative",
+                transition: "all 0.3s ease", // ⭐ Smooth hover + collapse
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#F3F4F6";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = isActive
+                  ? "#F5F7FB"
+                  : "transparent";
+              }}
+            >
+              <span
+                className="icon"
+                style={{
+                  ...styles.icon,
+                  transition: "transform 0.3s ease", // ⭐ Smooth icon
+                }}
+              >
+                {item.icon}
+              </span>
+
+              {!collapsed && (
+                <span
+                  style={{
+                    transition: "opacity 0.3s ease, transform 0.3s ease",
+                    opacity: collapsed ? 0 : 1,
+                    transform: collapsed ? "translateX(-10px)" : "translateX(0)",
+                  }}
+                >
+                  {item.label}
+                </span>
+              )}
+
+              {collapsed && isActive && (
+                <span
+                  style={{
+                    position: "absolute",
+                    bottom: 4,
+                    width: 6,
+                    height: 6,
+                    borderRadius: "50%",
+                    backgroundColor: "#5B21B6",
+                  }}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      <div style={styles.sidebarFooter}>
         <button
           onClick={handleLogout}
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            background: 'none',
-            border: 'none',
-            color: '#EF4444',
+            background: "none",
+            border: "none",
+            color: "#B91C1C",
             fontSize: 16,
-            cursor: 'pointer',
-            padding: 0
+            cursor: "pointer",
+            width: "100%",
+            textAlign: collapsed ? "center" : "left",
+            padding: collapsed ? 0 : "8px 0",
+            transition: "all 0.3s ease", // ⭐ Smooth fade
           }}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1m0-10v1" />
-          </svg>
-          Sign out
+          {collapsed ? "⎋" : "Sign out"}
         </button>
       </div>
-    </div>
+    </aside>
   );
-};
+}
 
-export default Sidebar;
+const styles = {
+  sidebar: {
+    width: 200,
+    backgroundColor: "#F8FAFC",
+    borderRight: "1px solid #E5E7EB",
+    padding: 24,
+    display: "flex",
+    flexDirection: "column",
+    position: "fixed",
+    top: 0,
+    left: 0,
+    height: "100vh",
+    zIndex: 1000,
+  },
+  sidebarHeader: {
+    fontSize: 20,
+    fontWeight: 700,
+    marginBottom: 24,
+    color: "#111827",
+  },
+  sidebarNav: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 8,
+    flexGrow: 1,
+  },
+  sidebarItem: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "10px 12px",
+    borderRadius: 6,
+    fontSize: 14,
+    fontWeight: 500,
+    cursor: "pointer",
+    transition: "background-color 0.3s, color 0.3s",
+  },
+  sidebarFooter: {
+    marginTop: "auto",
+    paddingTop: 16,
+  },
+  icon: {
+    fontSize: 18,
+  },
+};

@@ -1,0 +1,25 @@
+/*// src/firebase/config.js
+import { initializeApp } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';         // ✅ ICI
+import { getStorage } from 'firebase/storage';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD373gzNDKOnqw17vhSs-c5CrJMmaZW1rQ",
+  authDomain: "nightshipadmin.firebaseapp.com",
+  projectId: "nightshipadmin",
+  storageBucket: "nightshipadmin.firebasestorage.app",
+  messagingSenderId: "472671182348",
+  appId: "1:472671182348:web:e3eeb1da0a0fa5c18b9829"
+};
+
+// Initialise Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const auth = getAuth(app);
+const storage = getStorage(app);
+
+
+export { db, auth, storage }; 
+*/

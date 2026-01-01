@@ -1,0 +1,40 @@
+ <div style={styles.container}>
+      <Sidebar />
+      {/* Main content */}
+      <main style={styles.main}>
+       
+
+        {/* Action buttons row */}
+        <div style={styles.actionsBar}>
+          <button style={styles.actionBtn} onClick={() => navigate("/create-order")}>
+            + Create Order
+          </button>
+          <button style={styles.actionBtn} onClick={() => navigate("/live-map")}>
+            View Active Drivers
+          </button>
+          <button style={styles.actionBtn} onClick={() => navigate("/support")}>
+            Support
+          </button>
+          {/* Online / Break / Lunch controls */}
+          <button
+            style={{ ...styles.actionBtn, backgroundColor: online ? "#F59E0B" : "#6B7280" }}
+            onClick={handleToggleOnline}
+          >
+            {online ? "Go Offline" : "Go Online"}
+          </button>
+          {onlineStart && <span style={styles.timer}>{formatDuration(onlineStart)}</span>}
+          <button
+            style={{ ...styles.actionBtn, backgroundColor: onBreak ? "#F59E0B" : "#6B7280" }}
+            onClick={handleBreak}
+          >
+            {onBreak ? "End Break" : "Break"}
+          </button>
+          {breakStartTime && <span style={styles.timer}>{formatDuration(breakStartTime)}</span>}
+          <button
+            style={{ ...styles.actionBtn, backgroundColor: onLunch ? "#F59E0B" : "#6B7280" }}
+            onClick={handleLunch}
+          >
+            {onLunch ? "End Lunch" : "Lunch"}
+          </button>
+          {lunchStartTime && <span style={styles.timer}>{formatDuration(lunchStartTime)}</span>}
+        </div>

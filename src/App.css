@@ -1,3 +1,4 @@
+
 * {
   margin: 0;
   padding: 0;
@@ -5,7 +6,7 @@
 }
 
 h1, .boot {
-  margin-top: -400px;
+  margin-top: 0;
 }
 
 body {
@@ -124,3 +125,38 @@ body {
 .gmnoprint {
   margin-bottom: 70px !important;
 }
+
+/* Sidebar de base */
+.sidebar {
+  width: 240px;
+  background-color: #0d1b2a;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+  transition: transform 0.3s ease;
+}
+
+/* Sur mobile, cache la sidebar par défaut */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+}
+
+input[disabled], textarea[disabled], 
+input[readonly], textarea[readonly] {
+    background-color: #f0f0f0 !important;
+    color: #666;
+  }
+
+
